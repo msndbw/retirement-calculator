@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>احتساب الراتب التقاعدي – القطاع الخاص والاختياري</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== المتغيرات ===== */
+    :root {
+      --bg-main:      #f4f6fb;
+      --bg-card:      #ffffff;
+      --bg-surface:   #f0f4fa;
+      --bg-input:     #f7f9fc;
+      --border:       #dde3f0;
+      --border-hover: #b6c2db;
+      --green:        #16a34a;
+      --green-light:  #22c55e;
+      --green-pale:   #e8f9ef;
+      --green-border: #b6e8c9;
+      --gold:         #b07d1a;
+      --gold-light:   #d4a144;
+      --gold-pale:    #fdf6e3;
+      --gold-border:  #e8c97a;
+      --blue:         #1d4ed8;
+      --blue-light:   #3b82f6;
+      --blue-pale:    #eff6ff;
+      --red:          #dc2626;
+      --red-pale:     #fef2f2;
+      --amber:        #d97706;
+      --text-main:    #1e293b;
+      --text-muted:   #64748b;
+      --text-label:   #334155;
+      --text-heading: #0f172a;
+      --radius-lg:    18px;
+      --radius-md:    12px;
+      --radius-sm:    8px;
+      --shadow-sm:    0 1px 4px rgba(30,41,59,.07), 0 4px 16px rgba(30,41,59,.06);
+      --shadow-md:    0 4px 24px rgba(30,41,59,.10), 0 1px 4px rgba(30,41,59,.06);
+      --shadow-card:  0 2px 8px rgba(30,41,59,.08), 0 8px 32px rgba(30,41,59,.08);
+    }
+
+    /* ===== إعادة الضبط ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Tajawal', Arial, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      direction: rtl;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; right: 0; left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--green-light), var(--gold-light), var(--blue-light));
+      z-index: 100;
+    }
+
+    /* ===== الشاشات ===== */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: block; }
+    #home { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px 80px; min-height: 100vh; position: relative; }
+    #home.active { display: flex; }
+    #home::after {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 80%, rgba(22,163,74,.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 85% 20%, rgba(212,161,68,.07) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(59,130,246,.04) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ===== الصفحة الرئيسية ===== */
+    .home-inner {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 780px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .home-logo {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #fff 0%, var(--bg-surface) 100%);
+      border: 1.5px solid var(--border); border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 34px; margin-bottom: 24px; box-shadow: var(--shadow-sm);
+    }
+    .home-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blue-pale); border: 1px solid rgba(59,130,246,.25);
+      border-radius: 40px; padding: 7px 18px;
+      font-size: 13px; color: var(--blue); font-weight: 600; margin-bottom: 20px;
+    }
+    .home-title {
+      font-size: clamp(26px, 5vw, 40px); font-weight: 900;
+      line-height: 1.3; color: var(--text-heading);
+      text-align: center; margin-bottom: 10px;
+    }
+    .home-title .hl-green { color: var(--green); }
+    .home-title .hl-gold  { color: var(--gold); }
+    .home-subtitle { font-size: 16px; color: var(--text-muted); text-align: center; margin-bottom: 52px; }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 20px; width: 100%;
+    }
+    .choice-card {
+      background: var(--bg-card); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 36px 28px 28px;
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+      box-shadow: var(--shadow-sm); text-align: right;
+    }
+    .choice-card::before {
+      content: ''; position: absolute;
+      top: 0; right: 0; left: 0; height: 3px;
+      opacity: 0; transition: opacity .25s;
+    }
+    .choice-card.private::before  { background: linear-gradient(90deg, var(--green-light), #4ade80); }
+    .choice-card.optional::before { background: linear-gradient(90deg, var(--gold-light), #fbbf24); }
+    .choice-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+    .choice-card:hover::before { opacity: 1; }
+    .choice-card.private:hover  { border-color: var(--green-border); }
+    .choice-card.optional:hover { border-color: var(--gold-border); }
+    .card-icon {
+      width: 54px; height: 54px; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; margin-bottom: 18px;
+    }
+    .private .card-icon  { background: var(--green-pale); border: 1px solid var(--green-border); }
+    .optional .card-icon { background: var(--gold-pale);  border: 1px solid var(--gold-border); }
+    .card-title { font-size: 20px; font-weight: 800; color: var(--text-heading); margin-bottom: 10px; line-height: 1.4; }
+    .card-desc  { font-size: 14px; color: var(--text-muted); line-height: 1.8; margin-bottom: 26px; }
+    .card-features { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .feature-tag { font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+    .private .feature-tag  { background: var(--green-pale); color: var(--green); }
+    .optional .feature-tag { background: var(--gold-pale);  color: var(--gold); }
+    .card-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 700;
+      padding: 10px 20px; border-radius: 40px; transition: gap .2s;
+    }
+    .private .card-cta  { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-border); }
+    .optional .card-cta { background: var(--gold-pale);  color: var(--gold);  border: 1px solid var(--gold-border); }
+    .choice-card:hover .card-cta { gap: 12px; }
+    .home-footer {
+      margin-top: 48px; text-align: center; font-size: 13px; color: var(--text-muted);
+      padding: 16px 24px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+    }
+
+    /* ===== صفحات الحاسبة ===== */
+    .page-wrap { max-width: 740px; margin: 0 auto; padding: 28px 20px 80px; }
+    .top-nav { display: flex; align-items: center; margin-bottom: 28px; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--bg-card); border: 1.5px solid var(--border);
+      color: var(--text-muted); font-size: 14px;
+      font-family: 'Tajawal', sans-serif; font-weight: 600;
+      padding: 9px 18px; border-radius: 40px; cursor: pointer;
+      transition: background .2s, color .2s, border-color .2s;
+      box-shadow: var(--shadow-sm);
+    }
+    .back-btn:hover { background: var(--bg-surface); color: var(--text-main); border-color: var(--border-hover); }
+    .page-header {
+      background: var(--bg-card); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 24px 28px;
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 20px; box-shadow: var(--shadow-sm);
+    }
+    .page-header-icon {
+      width: 52px; height: 52px; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .private-page  .page-header-icon { background: var(--green-pale); border: 1px solid var(--green-border); }
+    .optional-page .page-header-icon { background: var(--gold-pale);  border: 1px solid var(--gold-border); }
+    .page-header-text h1 { font-size: clamp(16px, 3vw, 22px); font-weight: 800; color: var(--text-heading); line-height: 1.35; }
+    .private-page  .page-header-text h1 span { color: var(--green); }
+    .optional-page .page-header-text h1 span { color: var(--gold); }
+    .page-header-text p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ===== بطاقة الحساب ===== */
+    .calc-card {
+      background: var(--bg-card); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-card);
+    }
+    .section-label {
+      font-size: 11px; font-weight: 800; letter-spacing: 1.8px;
+      margin-bottom: 16px; padding-bottom: 12px;
+      border-bottom: 1.5px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .private-page  .section-label { color: var(--green); }
+    .optional-page .section-label { color: var(--gold); }
+    .friendly-note {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 16px;
+      font-size: 13.5px; color: var(--text-muted);
+      margin-bottom: 20px; text-align: center; line-height: 1.6;
+    }
+    label.field-label {
+      display: block; margin: 18px 0 7px;
+      font-weight: 700; font-size: 14px; color: var(--text-label);
+    }
+    input[type="text"], input[type="number"], select, output {
+      width: 100%; padding: 12px 14px;
+      border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+      background: var(--bg-input); color: var(--text-main);
+      font-size: 15px; font-family: 'Tajawal', sans-serif;
+      transition: border-color .2s, box-shadow .2s; display: block;
+    }
+    input:focus, select:focus { outline: none; }
+    .private-page  input:focus, .private-page  select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,163,74,.1); }
+    .optional-page input:focus, .optional-page select:focus { border-color: var(--gold-light); box-shadow: 0 0 0 3px rgba(212,161,68,.12); }
+    select option { background: #fff; color: var(--text-main); }
+    output { background: var(--bg-surface); font-weight: 800; font-size: 18px; color: var(--text-heading); }
+
+    /* متوسط الأجر — مخفي حتى تكتمل الحقول */
+    .avg-section { display: none; margin-top: 8px; }
+
+    .wage-warning {
+      display: none; font-size: 12.5px; color: var(--amber);
+      margin-top: 5px; padding: 6px 10px;
+      background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-sm);
+    }
+    .avg-note {
+      display: none; font-size: 13px; color: var(--red);
+      margin-top: 6px; padding: 6px 10px;
+      background: var(--red-pale); border: 1px solid #fca5a5; border-radius: var(--radius-sm);
+    }
+    .divider { height: 1.5px; background: var(--border); margin: 24px 0; }
+    .buy-box { display: none; margin-top: 4px; }
+    .service-details {
+      display: none; background: var(--bg-surface);
+      border: 1.5px solid var(--border); border-radius: var(--radius-md);
+      padding: 18px; margin-top: 12px;
+    }
+    .service-details .price-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 14px; color: var(--text-muted);
+      padding: 9px 0; border-bottom: 1px solid var(--border);
+    }
+    .service-details .price-row:last-of-type { border-bottom: none; }
+    .service-details .price-row strong { color: var(--text-main); font-size: 15px; }
+    .warning { color: var(--red); font-size: 13px; margin-top: 6px; font-weight: 600; }
+    .calc-btn {
+      margin-top: 24px; width: 100%; padding: 15px; border: none;
+      border-radius: var(--radius-md); font-size: 17px; font-weight: 800;
+      font-family: 'Tajawal', sans-serif; cursor: pointer;
+      transition: opacity .2s, transform .1s, box-shadow .2s;
+    }
+    .calc-btn:hover { opacity: .93; box-shadow: var(--shadow-md); }
+    .calc-btn:active { transform: scale(.98); }
+    .private-page  .calc-btn { background: linear-gradient(135deg, var(--green-light), var(--green)); color: #fff; box-shadow: 0 4px 16px rgba(22,163,74,.25); }
+    .optional-page .calc-btn { background: linear-gradient(135deg, var(--gold-light), var(--gold)); color: #fff; box-shadow: 0 4px 16px rgba(212,161,68,.25); }
+
+    /* ===== نتيجة الراتب ===== */
+    .result-box {
+      display: none;
+      margin-top: 20px; padding: 24px 20px; border-radius: var(--radius-md); text-align: center;
+    }
+    .result-box.visible { display: block; }
+    .private-page  .result-box { background: linear-gradient(135deg, var(--green-pale), #f0fdf4); border: 2px solid var(--green-border); }
+    .optional-page .result-box { background: linear-gradient(135deg, var(--gold-pale), #fffbeb);  border: 2px solid var(--gold-border); }
+    .result-box .label  { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
+    .result-box .amount { font-size: 30px; font-weight: 900; }
+    .private-page  .result-box .amount { color: var(--green); }
+    .optional-page .result-box .amount { color: var(--gold); }
+    .result-box .currency-note { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+
+    /* تفاصيل الاحتساب */
+    .calc-details {
+      margin-top: 14px; padding: 14px 16px;
+      background: rgba(255,255,255,.7); border-radius: var(--radius-sm);
+      font-size: 13px; color: var(--text-muted); line-height: 1.9; text-align: right;
+    }
+    .calc-details span { font-weight: 700; color: var(--text-main); }
+
+    .note {
+      margin-top: 10px; font-size: 13.5px; color: var(--red);
+      text-align: center; padding: 10px 14px;
+      background: var(--red-pale); border: 1px solid #fca5a5;
+      border-radius: var(--radius-sm); font-weight: 600; line-height: 1.7;
+    }
+    .note:empty { display: none; }
+    .cabinet-note {
+      display: none; margin-top: 8px; font-size: 13px; color: var(--blue);
+      text-align: center; line-height: 1.7; padding: 10px 14px;
+      background: var(--blue-pale); border: 1px solid rgba(59,130,246,.2); border-radius: var(--radius-sm);
+    }
+
+    /* ملاحظات أسفل النتيجة */
+    .result-notes {
+      display: none;
+      margin-top: 12px; padding: 16px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 13px; color: var(--text-muted);
+      line-height: 2;
+    }
+    .result-notes.visible { display: block; }
+    .result-notes li { margin-right: 10px; margin-bottom: 4px; }
+
+    .total-buy-result { margin-top: 12px; padding: 13px 16px; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; }
+    .private-page  .total-buy-result { background: var(--green-pale); border: 1px solid var(--green-border); color: var(--green); }
+    .optional-page .total-buy-result { background: var(--gold-pale);  border: 1px solid var(--gold-border);  color: var(--gold); }
+    .info-strip {
+      margin-top: 20px; padding: 12px 16px;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 12.5px;
+      color: var(--text-muted); line-height: 1.7; text-align: center;
+    }
+
+    /* ===== ذيل الموقع ===== */
+    .site-footer {
+      margin-top: 40px; padding: 20px 24px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+      text-align: center; font-size: 14px; color: var(--text-muted); line-height: 2;
+    }
+    .site-footer a.fb-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: #1877f2; font-weight: 700; text-decoration: none;
+      padding: 7px 16px; border-radius: 40px;
+      background: #e7f0fd; border: 1px solid #b3d0f7;
+      transition: background .2s;
+    }
+    .site-footer a.fb-link:hover { background: #d0e5fc; }
+    .fb-icon { width: 20px; height: 20px; fill: #1877f2; vertical-align: middle; }
+
+    /* عداد الزوار */
+    .visitor-counter {
+      margin-top: 16px; font-size: 13px; color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .counter-badge {
+      background: var(--blue-pale); border: 1px solid rgba(59,130,246,.25);
+      color: var(--blue); font-weight: 800; padding: 4px 14px;
+      border-radius: 40px; font-size: 15px;
+    }
+
+    /* ===== تحويل الأشهر إلى سنوات ===== */
+    .months-display {
+      display: none;
+      margin-top: 8px; padding: 10px 14px;
+      background: var(--blue-pale); border: 1px solid rgba(59,130,246,.25);
+      border-radius: var(--radius-sm); font-size: 14px;
+      color: var(--blue); font-weight: 700; text-align: right;
+      direction: rtl;
+    }
+    .months-display .md-icon { margin-left: 6px; }
+
+    /* ===== استجابة ===== */
+    @media (max-width: 600px) {
+      .calc-card { padding: 18px 14px; }
+      .home-title { font-size: 22px; }
+      .page-header { padding: 16px 14px; gap: 12px; flex-wrap: wrap; }
+      .choice-card { padding: 24px 18px 20px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .page-wrap { padding: 16px 12px 60px; }
+      .result-box .amount { font-size: 26px; }
+      .service-details .price-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .back-btn { font-size: 13px; padding: 8px 14px; }
+    }
+    @media (max-width: 380px) {
+      .home-title { font-size: 19px; }
+      .calc-card { padding: 14px 10px; }
+      .result-box .amount { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== الصفحة الرئيسية ===== -->
+  <div class="screen active" id="home">
+    <div class="home-inner">
+      <div class="home-logo">🧮</div>
+      <div class="home-badge">📋 قانون التقاعد والضمان الاجتماعي للعمال رقم 18 لسنة 2023</div>
+      <h1 class="home-title">
+        احتساب الراتب التقاعدي<br>
+        <span class="hl-green">للقطاع الخاص</span>
+        و<span class="hl-gold">الاختياري</span>
+      </h1>
+      <p class="home-subtitle">اختر النظام الذي تريد الاحتساب وفقه</p>
+
+      <div class="cards-grid">
+        <!-- القطاع الخاص -->
+        <div class="choice-card private" onclick="showScreen('private')">
+          <div class="card-icon">🏢</div>
+          <div class="card-title">احتساب الراتب التقاعدي<br>للقطاع الخاص</div>
+          <div class="card-features">
+            <span class="feature-tag">✔ إدخال الأجر يدوياً</span>
+            <span class="feature-tag">✔ شراء الخدمة</span>
+            <span class="feature-tag">✔ السنوات الخمس</span>
+          </div>
+          <div class="card-desc">احتساب الراتب التقاعدي للعاملين في القطاع الخاص وفق قانون الضمان الاجتماعي مع إمكانية احتساب مبلغ شراء الخدمة.</div>
+          <div class="card-cta">ابدأ الاحتساب ←</div>
+        </div>
+
+        <!-- الضمان الاختياري للأعمال الحرة -->
+        <div class="choice-card optional" onclick="showScreen('optional')">
+          <div class="card-icon">📋</div>
+          <div class="card-title">احتساب الراتب التقاعدي<br>تقاعد الضمان الاختياري للأعمال الحرة</div>
+          <div class="card-features">
+            <span class="feature-tag">✔ فئات الأجر</span>
+            <span class="feature-tag">✔ شراء الخدمة</span>
+            <span class="feature-tag">✔ 15 فئة معتمدة</span>
+          </div>
+          <div class="card-desc">احتساب الراتب التقاعدي للمشتركين في تقاعد الضمان الاختياري للأعمال الحرة وفق الفئات المعتمدة في قانون الضمان الاجتماعي.</div>
+          <div class="card-cta">ابدأ الاحتساب ←</div>
+        </div>
+      </div>
+
+      <div class="home-footer">
+        📜 استناداً إلى قانون التقاعد والضمان الاجتماعي للعمال رقم 18 لسنة 2023 وقرار مجلس الوزراء رقم 24436 لسنة 2024
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== صفحة القطاع الخاص ===== -->
+  <div class="screen private-page" id="private">
+    <div class="page-wrap">
+      <div class="top-nav">
+        <button class="back-btn" onclick="showScreen('home')">← العودة للرئيسية</button>
+      </div>
+      <div class="page-header">
+        <div class="page-header-icon">🏢</div>
+        <div class="page-header-text">
+          <h1>احتساب الراتب التقاعدي<br><span>للقطاع الخاص</span></h1>
+          <p>أدخل أجورك للسنوات الخمس الأخيرة قبل التقاعد</p>
+        </div>
+      </div>
+      <div class="calc-card">
+        <div class="section-label">أجور السنوات الخمس الماضية</div>
+
+        <label class="field-label">أجر السنة 1</label>
+        <input class="p-wage" id="p-w1" type="text" inputmode="numeric" placeholder="أدخل الأجر بالدينار العراقي" />
+        <div class="wage-warning" id="p-w1-warning"></div>
+
+        <label class="field-label">أجر السنة 2</label>
+        <input class="p-wage" id="p-w2" type="text" inputmode="numeric" placeholder="أدخل الأجر بالدينار العراقي" />
+        <div class="wage-warning" id="p-w2-warning"></div>
+
+        <label class="field-label">أجر السنة 3</label>
+        <input class="p-wage" id="p-w3" type="text" inputmode="numeric" placeholder="أدخل الأجر بالدينار العراقي" />
+        <div class="wage-warning" id="p-w3-warning"></div>
+
+        <label class="field-label">أجر السنة 4</label>
+        <input class="p-wage" id="p-w4" type="text" inputmode="numeric" placeholder="أدخل الأجر بالدينار العراقي" />
+        <div class="wage-warning" id="p-w4-warning"></div>
+
+        <label class="field-label">أجر السنة 5</label>
+        <input class="p-wage" id="p-w5" type="text" inputmode="numeric" placeholder="أدخل الأجر بالدينار العراقي" />
+        <div class="wage-warning" id="p-w5-warning"></div>
+
+        <!-- متوسط الأجر — يظهر فقط بعد ملء جميع الحقول الخمسة -->
+        <div class="avg-section" id="p-avgSection">
+          <div id="p-avgNote" class="avg-note"></div>
+          <label class="field-label">متوسط الأجر (يُحسب تلقائياً)</label>
+          <output id="p-avgOut">0</output>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- شراء الخدمة -->
+        <div id="p-buyBox" class="buy-box">
+          <div class="section-label">شراء الخدمة</div>
+          <label class="field-label">هل تريد معرفة مبلغ شراء الخدمة؟</label>
+          <select id="p-buyService">
+            <option value="no">لا</option>
+            <option value="yes">نعم</option>
+          </select>
+          <div id="p-serviceBox" class="service-details">
+            <div class="price-row">
+              <span>سعر الشهر الواحد (17% من متوسط الأجر)</span>
+              <strong><span id="p-monthPrice">0</span> دينار</strong>
+            </div>
+            <div class="price-row">
+              <span>سعر السنة الواحدة (×12)</span>
+              <strong><span id="p-yearPrice">0</span> دينار</strong>
+            </div>
+            <label class="field-label">عدد الأشهر التي تود شراؤها (بحد أقصى 60 شهراً)</label>
+            <input id="p-buyMonths" type="number" inputmode="numeric" min="0" max="60" placeholder="0" />
+            <div id="p-buyWarning" class="warning"></div>
+            <div class="total-buy-result">
+              المبلغ الكلي لشراء الخدمة: <span id="p-totalBuy">0</span> دينار
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-label">بيانات الاحتساب</div>
+        <label class="field-label">عدد أشهر الخدمة الفعلية</label>
+        <input id="p-months" type="number" inputmode="numeric" min="0" placeholder="أدخل إجمالي عدد الأشهر" />
+        <div class="months-display" id="p-monthsDisplay">
+          <span class="md-icon">📅</span> مدة الخدمة: <span id="p-monthsText"></span>
+        </div>
+        <button class="calc-btn" id="p-calcBtn">احتساب الراتب التقاعدي</button>
+
+        <div class="result-box" id="p-resultBox">
+          <div class="label">الراتب التقاعدي المحتسب</div>
+          <div class="amount"><span id="p-pension">0</span> دينار</div>
+          <div class="currency-note">دينار عراقي شهرياً</div>
+        </div>
+        <div id="p-note" class="note"></div>
+        <div id="p-cabinetNote" class="cabinet-note"></div>
+        <div class="result-notes" id="p-resultNotes">
+          <ul style="list-style:none; padding:0;">
+            <li>⚠️ <strong>الراتب المذكور تقديري وليس رسمياً.</strong></li>
+            <li>📌 يستند الاحتساب إلى <strong>المادة 35</strong> مع مراعاة <strong>المادة 36</strong> من قانون الضمان رقم 18 لسنة 2023.</li>
+            <li>💰 توجد مخصصات غلاء معيشة حسب <strong>المادة 43</strong>، ويتم إضافتها من قبل دائرة الضمان.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ذيل صفحة القطاع الخاص -->
+      <div class="site-footer">
+        <div>للمزيد من الاستفسارات يمكنكم التواصل عبر صفحتنا على الفيسبوك</div>
+        <div style="margin-top:10px;">
+          <a class="fb-link" href="https://www.facebook.com/share/1Ag3EosVga/" target="_blank" rel="noopener">
+            <svg class="fb-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073C24 5.404 18.627 0 12 0S0 5.404 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+            التقاعد الاختياري العراقي
+          </a>
+        </div>
+        <div class="visitor-counter">
+          <span>👥 عدد الزوار:</span>
+          <span class="counter-badge" id="p-visitorBadge"></span>
+        </div>
+        <script type="text/javascript" src="https://counter.websiteout.com/js/7/0/0/0"></script>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== صفحة الضمان الاختياري للأعمال الحرة ===== -->
+  <div class="screen optional-page" id="optional">
+    <div class="page-wrap">
+      <div class="top-nav">
+        <button class="back-btn" onclick="showScreen('home')">← العودة للرئيسية</button>
+      </div>
+      <div class="page-header">
+        <div class="page-header-icon">📋</div>
+        <div class="page-header-text">
+          <h1>احتساب الراتب التقاعدي<br><span>تقاعد الضمان الاختياري للأعمال الحرة</span></h1>
+          <p>اختر فئة الأجر المناسبة لكل سنة من السنوات الخمس</p>
+        </div>
+      </div>
+      <div class="calc-card">
+        <div class="section-label">فئات الأجر للسنوات الخمس الماضية</div>
+        <div class="friendly-note">اختر الفئة المناسبة لأجرك لكل سنة من السنوات الخمس الماضية قبل التقاعد</div>
+
+        <label class="field-label">أجر السنة 1</label>
+        <select class="o-wage" id="o-w1">
+          <option value="">-- اختر الفئة --</option>
+          <option value="350000">الفئة الأولى – 350,000 دينار</option>
+          <option value="455000">الفئة الثانية – 455,000 دينار</option>
+          <option value="560000">الفئة الثالثة – 560,000 دينار</option>
+          <option value="665000">الفئة الرابعة – 665,000 دينار</option>
+          <option value="770000">الفئة الخامسة – 770,000 دينار</option>
+          <option value="875000">الفئة السادسة – 875,000 دينار</option>
+          <option value="980000">الفئة السابعة – 980,000 دينار</option>
+          <option value="1085000">الفئة الثامنة – 1,085,000 دينار</option>
+          <option value="1190000">الفئة التاسعة – 1,190,000 دينار</option>
+          <option value="1295000">الفئة العاشرة – 1,295,000 دينار</option>
+          <option value="1400000">الفئة الحادية عشر – 1,400,000 دينار</option>
+          <option value="1505000">الفئة الثانية عشر – 1,505,000 دينار</option>
+          <option value="1610000">الفئة الثالثة عشر – 1,610,000 دينار</option>
+          <option value="1715000">الفئة الرابعة عشر – 1,715,000 دينار</option>
+          <option value="1750000">الفئة الخامسة عشر – 1,750,000 دينار</option>
+        </select>
+        <div class="wage-warning" id="o-w1-warning"></div>
+
+        <label class="field-label">أجر السنة 2</label>
+        <select class="o-wage" id="o-w2">
+          <option value="">-- اختر الفئة --</option>
+          <option value="350000">الفئة الأولى – 350,000 دينار</option>
+          <option value="455000">الفئة الثانية – 455,000 دينار</option>
+          <option value="560000">الفئة الثالثة – 560,000 دينار</option>
+          <option value="665000">الفئة الرابعة – 665,000 دينار</option>
+          <option value="770000">الفئة الخامسة – 770,000 دينار</option>
+          <option value="875000">الفئة السادسة – 875,000 دينار</option>
+          <option value="980000">الفئة السابعة – 980,000 دينار</option>
+          <option value="1085000">الفئة الثامنة – 1,085,000 دينار</option>
+          <option value="1190000">الفئة التاسعة – 1,190,000 دينار</option>
+          <option value="1295000">الفئة العاشرة – 1,295,000 دينار</option>
+          <option value="1400000">الفئة الحادية عشر – 1,400,000 دينار</option>
+          <option value="1505000">الفئة الثانية عشر – 1,505,000 دينار</option>
+          <option value="1610000">الفئة الثالثة عشر – 1,610,000 دينار</option>
+          <option value="1715000">الفئة الرابعة عشر – 1,715,000 دينار</option>
+          <option value="1750000">الفئة الخامسة عشر – 1,750,000 دينار</option>
+        </select>
+        <div class="wage-warning" id="o-w2-warning"></div>
+
+        <label class="field-label">أجر السنة 3</label>
+        <select class="o-wage" id="o-w3">
+          <option value="">-- اختر الفئة --</option>
+          <option value="350000">الفئة الأولى – 350,000 دينار</option>
+          <option value="455000">الفئة الثانية – 455,000 دينار</option>
+          <option value="560000">الفئة الثالثة – 560,000 دينار</option>
+          <option value="665000">الفئة الرابعة – 665,000 دينار</option>
+          <option value="770000">الفئة الخامسة – 770,000 دينار</option>
+          <option value="875000">الفئة السادسة – 875,000 دينار</option>
+          <option value="980000">الفئة السابعة – 980,000 دينار</option>
+          <option value="1085000">الفئة الثامنة – 1,085,000 دينار</option>
+          <option value="1190000">الفئة التاسعة – 1,190,000 دينار</option>
+          <option value="1295000">الفئة العاشرة – 1,295,000 دينار</option>
+          <option value="1400000">الفئة الحادية عشر – 1,400,000 دينار</option>
+          <option value="1505000">الفئة الثانية عشر – 1,505,000 دينار</option>
+          <option value="1610000">الفئة الثالثة عشر – 1,610,000 دينار</option>
+          <option value="1715000">الفئة الرابعة عشر – 1,715,000 دينار</option>
+          <option value="1750000">الفئة الخامسة عشر – 1,750,000 دينار</option>
+        </select>
+        <div class="wage-warning" id="o-w3-warning"></div>
+
+        <label class="field-label">أجر السنة 4</label>
+        <select class="o-wage" id="o-w4">
+          <option value="">-- اختر الفئة --</option>
+          <option value="350000">الفئة الأولى – 350,000 دينار</option>
+          <option value="455000">الفئة الثانية – 455,000 دينار</option>
+          <option value="560000">الفئة الثالثة – 560,000 دينار</option>
+          <option value="665000">الفئة الرابعة – 665,000 دينار</option>
+          <option value="770000">الفئة الخامسة – 770,000 دينار</option>
+          <option value="875000">الفئة السادسة – 875,000 دينار</option>
+          <option value="980000">الفئة السابعة – 980,000 دينار</option>
+          <option value="1085000">الفئة الثامنة – 1,085,000 دينار</option>
+          <option value="1190000">الفئة التاسعة – 1,190,000 دينار</option>
+          <option value="1295000">الفئة العاشرة – 1,295,000 دينار</option>
+          <option value="1400000">الفئة الحادية عشر – 1,400,000 دينار</option>
+          <option value="1505000">الفئة الثانية عشر – 1,505,000 دينار</option>
+          <option value="1610000">الفئة الثالثة عشر – 1,610,000 دينار</option>
+          <option value="1715000">الفئة الرابعة عشر – 1,715,000 دينار</option>
+          <option value="1750000">الفئة الخامسة عشر – 1,750,000 دينار</option>
+        </select>
+        <div class="wage-warning" id="o-w4-warning"></div>
+
+        <label class="field-label">أجر السنة 5</label>
+        <select class="o-wage" id="o-w5">
+          <option value="">-- اختر الفئة --</option>
+          <option value="350000">الفئة الأولى – 350,000 دينار</option>
+          <option value="455000">الفئة الثانية – 455,000 دينار</option>
+          <option value="560000">الفئة الثالثة – 560,000 دينار</option>
+          <option value="665000">الفئة الرابعة – 665,000 دينار</option>
+          <option value="770000">الفئة الخامسة – 770,000 دينار</option>
+          <option value="875000">الفئة السادسة – 875,000 دينار</option>
+          <option value="980000">الفئة السابعة – 980,000 دينار</option>
+          <option value="1085000">الفئة الثامنة – 1,085,000 دينار</option>
+          <option value="1190000">الفئة التاسعة – 1,190,000 دينار</option>
+          <option value="1295000">الفئة العاشرة – 1,295,000 دينار</option>
+          <option value="1400000">الفئة الحادية عشر – 1,400,000 دينار</option>
+          <option value="1505000">الفئة الثانية عشر – 1,505,000 دينار</option>
+          <option value="1610000">الفئة الثالثة عشر – 1,610,000 دينار</option>
+          <option value="1715000">الفئة الرابعة عشر – 1,715,000 دينار</option>
+          <option value="1750000">الفئة الخامسة عشر – 1,750,000 دينار</option>
+        </select>
+        <div class="wage-warning" id="o-w5-warning"></div>
+
+        <!-- متوسط الأجر — يظهر فقط بعد اختيار جميع الفئات الخمسة -->
+        <div class="avg-section" id="o-avgSection">
+          <div id="o-avgNote" class="avg-note"></div>
+          <label class="field-label">متوسط الأجر (يُحسب تلقائياً)</label>
+          <output id="o-avgOut">0</output>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- شراء الخدمة -->
+        <div id="o-buyBox" class="buy-box">
+          <div class="section-label">شراء الخدمة</div>
+          <label class="field-label">هل تريد معرفة مبلغ شراء الخدمة؟</label>
+          <select id="o-buyService">
+            <option value="no">لا</option>
+            <option value="yes">نعم</option>
+          </select>
+          <div id="o-serviceBox" class="service-details">
+            <div class="price-row">
+              <span>سعر الشهر الواحد (17% من متوسط الأجر)</span>
+              <strong><span id="o-monthPrice">0</span> دينار</strong>
+            </div>
+            <div class="price-row">
+              <span>سعر السنة الواحدة (×12)</span>
+              <strong><span id="o-yearPrice">0</span> دينار</strong>
+            </div>
+            <label class="field-label">عدد الأشهر التي تود شراؤها (بحد أقصى 60 شهراً)</label>
+            <input id="o-buyMonths" type="number" inputmode="numeric" min="0" max="60" placeholder="0" />
+            <div id="o-buyWarning" class="warning"></div>
+            <div class="total-buy-result">
+              المبلغ الكلي لشراء الخدمة (دفع نقدي): <span id="o-totalBuy">0</span> دينار
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-label">بيانات الاحتساب</div>
+        <label class="field-label">عدد أشهر الخدمة الفعلية</label>
+        <input id="o-months" type="number" inputmode="numeric" min="0" placeholder="أدخل إجمالي عدد الأشهر" />
+        <div class="months-display" id="o-monthsDisplay">
+          <span class="md-icon">📅</span> مدة الخدمة: <span id="o-monthsText"></span>
+        </div>
+        <button class="calc-btn" id="o-calcBtn">احتساب الراتب التقاعدي</button>
+
+        <div class="result-box" id="o-resultBox">
+          <div class="label">الراتب التقاعدي المحتسب</div>
+          <div class="amount"><span id="o-pension">0</span> دينار</div>
+          <div class="currency-note">دينار عراقي شهرياً</div>
+        </div>
+        <div id="o-note" class="note"></div>
+        <div id="o-cabinetNote" class="cabinet-note"></div>
+        <div class="result-notes" id="o-resultNotes">
+          <ul style="list-style:none; padding:0;">
+            <li>⚠️ <strong>الراتب المذكور تقديري وليس رسمياً.</strong></li>
+            <li>📌 يستند الاحتساب إلى <strong>المادة 35</strong> مع مراعاة <strong>المادة 36</strong> من قانون الضمان رقم 18 لسنة 2023.</li>
+            <li>💰 توجد مخصصات غلاء معيشة حسب <strong>المادة 43</strong>، ويتم إضافتها من قبل دائرة الضمان.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ذيل صفحة الاختياري -->
+      <div class="site-footer">
+        <div>للمزيد من الاستفسارات يمكنكم التواصل عبر صفحتنا على الفيسبوك</div>
+        <div style="margin-top:10px;">
+          <a class="fb-link" href="https://www.facebook.com/share/1Ag3EosVga/" target="_blank" rel="noopener">
+            <svg class="fb-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073C24 5.404 18.627 0 12 0S0 5.404 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+            التقاعد الاختياري العراقي
+          </a>
+        </div>
+        <div class="visitor-counter">
+          <span>👥 عدد الزوار:</span>
+          <span class="counter-badge" id="o-visitorBadge"></span>
+        </div>
+        <script type="text/javascript" src="https://counter.websiteout.com/js/7/0/0/0"></script>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    /* =========================================================
+       دالة تحويل الأشهر إلى سنوات وأشهر
+    ========================================================= */
+    function monthsToText(totalMonths) {
+      if (!totalMonths || totalMonths <= 0) return '';
+      const years  = Math.floor(totalMonths / 12);
+      const months = totalMonths % 12;
+      let parts = [];
+      if (years === 1) parts.push('سنة واحدة');
+      else if (years === 2) parts.push('سنتان');
+      else if (years > 2) parts.push(years + ' سنوات');
+      if (months === 1) parts.push('شهر واحد');
+      else if (months === 2) parts.push('شهران');
+      else if (months > 2) parts.push(months + ' أشهر');
+      return parts.join(' و ');
+    }
+
+    /* ربط حقل الأشهر بالعرض التلقائي — القطاع الخاص */
+    document.getElementById('p-months').addEventListener('input', function() {
+      const v = parseInt(this.value) || 0;
+      const display = document.getElementById('p-monthsDisplay');
+      const text    = document.getElementById('p-monthsText');
+      if (v > 0) {
+        text.textContent = monthsToText(v);
+        display.style.display = 'block';
+      } else {
+        display.style.display = 'none';
+      }
+    });
+
+    /* ربط حقل الأشهر بالعرض التلقائي — الاختياري */
+    document.getElementById('o-months').addEventListener('input', function() {
+      const v = parseInt(this.value) || 0;
+      const display = document.getElementById('o-monthsDisplay');
+      const text    = document.getElementById('o-monthsText');
+      if (v > 0) {
+        text.textContent = monthsToText(v);
+        display.style.display = 'block';
+      } else {
+        display.style.display = 'none';
+      }
+    });
+
+    /* =========================================================
+       الثوابت
+    ========================================================= */
+    const MAX_WAGE    = 1750000;
+    const MIN_PENSION = 350000;
+
+    /* =========================================================
+       دوال مساعدة
+    ========================================================= */
+    const parseNum = (val) => Number(String(val).replace(/[^0-9]/g, '')) || 0;
+    const fmt      = (n)   => Math.round(n).toLocaleString('en-US');
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const screen = document.getElementById(id);
+      screen.classList.add('active');
+      if (id === 'home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        /* التمرير إلى بداية بطاقة الحساب مباشرةً */
+        requestAnimationFrame(() => {
+          const card = screen.querySelector('.calc-card');
+          if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          else window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    }
+
+    /* =========================================================
+       ===== القطاع الخاص =====
+    ========================================================= */
+    const pWageInputs   = document.querySelectorAll('.p-wage');
+    const pWageWarnings = document.querySelectorAll('#private .wage-warning');
+    const pAvgSection   = document.getElementById('p-avgSection');
+    const pAvgOut       = document.getElementById('p-avgOut');
+    const pAvgNote      = document.getElementById('p-avgNote');
+    const pMonthsEl     = document.getElementById('p-months');
+    const pPensionEl    = document.getElementById('p-pension');
+    const pNoteEl       = document.getElementById('p-note');
+    const pCabinetNoteEl= document.getElementById('p-cabinetNote');
+    const pBuyBox       = document.getElementById('p-buyBox');
+    const pBuySelect    = document.getElementById('p-buyService');
+    const pServiceBox   = document.getElementById('p-serviceBox');
+    const pMonthPriceEl = document.getElementById('p-monthPrice');
+    const pYearPriceEl  = document.getElementById('p-yearPrice');
+    const pBuyMonthsEl  = document.getElementById('p-buyMonths');
+    const pTotalBuyEl   = document.getElementById('p-totalBuy');
+    const pBuyWarningEl = document.getElementById('p-buyWarning');
+    const pResultBox    = document.getElementById('p-resultBox');
+    const pResultNotes  = document.getElementById('p-resultNotes');
+
+    function pValidateLimitWage(input, warning) {
+      let value = parseNum(input.value);
+      if (value > MAX_WAGE) {
+        value = MAX_WAGE;
+        input.value = fmt(MAX_WAGE); /* تصحيح تلقائي */
+        warning.textContent = 'تم تعديل الأجر تلقائياً إلى الحد الأقصى: أعلى أجر معتمد بدائرة الضمان هو 1,750,000 دينار';
+        warning.style.display = 'block';
+      } else if (value === MAX_WAGE && value > 0) {
+        warning.textContent = 'أعلى أجر معتمد بدائرة الضمان هو 1,750,000 دينار';
+        warning.style.display = 'block';
+      } else {
+        warning.style.display = 'none';
+      }
+      return value;
+    }
+
+    function pAllFilled() {
+      return Array.from(pWageInputs).every(inp => parseNum(inp.value) > 0);
+    }
+
+    function pUpdateAverage() {
+      let total = 0, count = 0;
+      pWageInputs.forEach((inp, i) => {
+        const v = pValidateLimitWage(inp, pWageWarnings[i]);
+        if (v > 0) { total += v; count++; }
+      });
+
+      if (pAllFilled()) {
+        let avg = count ? Math.round(total / count) : 0;
+        if (avg > MAX_WAGE) {
+          avg = MAX_WAGE;
+          pAvgNote.textContent = 'ملاحظة: أعلى أجر معتمد بدائرة الضمان هو 1,750,000 دينار';
+          pAvgNote.style.display = 'block';
+        } else {
+          pAvgNote.style.display = 'none';
+        }
+        pAvgOut.textContent = fmt(avg);
+        pAvgSection.style.display = 'block';
+        pBuyBox.style.display = 'block';
+        pUpdateServicePrices(avg);
+      } else {
+        pAvgSection.style.display = 'none';
+        pBuyBox.style.display = 'none';
+      }
+    }
+
+    function pUpdateServicePrices(avg) {
+      if (pBuySelect.value === 'yes' && avg > 0) {
+        const mPrice = Math.round(avg * 0.17);
+        const yPrice = mPrice * 12;
+        pMonthPriceEl.textContent = fmt(mPrice);
+        pYearPriceEl.textContent  = fmt(yPrice);
+        const m = parseInt(pBuyMonthsEl.value) || 0;
+        if (m > 60) {
+          pBuyWarningEl.textContent = '⚠️ لا يمكن شراء أكثر من 60 شهراً (5 سنوات)';
+          pTotalBuyEl.textContent   = fmt(60 * mPrice);
+        } else {
+          pBuyWarningEl.textContent = '';
+          pTotalBuyEl.textContent   = fmt(m * mPrice);
+        }
+      }
+    }
+
+    pWageInputs.forEach((inp, i) => {
+      inp.addEventListener('keypress', (e) => {
+        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+          e.preventDefault();
+        }
+      });
+      inp.addEventListener('input', (e) => {
+        let raw = e.target.value.replace(/[^0-9]/g, '');
+        e.target.value = raw ? fmt(parseInt(raw)) : '';
+        pValidateLimitWage(inp, pWageWarnings[i]);
+        pUpdateAverage();
+      });
+      inp.addEventListener('blur', (e) => {
+        let raw = parseNum(e.target.value);
+        if (raw > 0) e.target.value = fmt(raw);
+        pValidateLimitWage(inp, pWageWarnings[i]);
+        pUpdateAverage();
+      });
+    });
+
+    pBuySelect.addEventListener('change', () => {
+      pServiceBox.style.display = pBuySelect.value === 'yes' ? 'block' : 'none';
+      if (pBuySelect.value === 'no') pBuyWarningEl.textContent = '';
+      pUpdateServicePrices(parseNum(pAvgOut.textContent));
+    });
+    pBuyMonthsEl.addEventListener('input', () => { pUpdateServicePrices(parseNum(pAvgOut.textContent)); });
+
+    /* حساب تلقائي لحظي عند تغيير عدد الأشهر */
+    function pDoCalc(showErrors) {
+      const avg    = parseNum(pAvgOut.textContent);
+      const months = parseInt(pMonthsEl.value) || 0;
+
+      /* تحقق من ملء حقول الأجر */
+      if (!pAllFilled()) {
+        if (showErrors) {
+          pWageInputs.forEach(inp => {
+            if (!parseNum(inp.value)) {
+              inp.style.borderColor = 'var(--red)';
+              inp.style.boxShadow   = '0 0 0 3px rgba(220,38,38,.15)';
+            }
+          });
+          pMonthsEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          /* رسالة بدلاً من alert */
+          pNoteEl.textContent = '⚠️ يرجى ملء جميع حقول الأجور للسنوات الخمس أولاً.';
+          pResultBox.classList.remove('visible');
+          pResultNotes.classList.remove('visible');
+        }
+        return;
+      }
+
+      if (months <= 0) {
+        if (showErrors) {
+          pMonthsEl.style.borderColor = 'var(--red)';
+          pMonthsEl.style.boxShadow   = '0 0 0 3px rgba(220,38,38,.15)';
+          pNoteEl.textContent = '⚠️ يرجى إدخال عدد أشهر الخدمة.';
+          pResultBox.classList.remove('visible');
+          pResultNotes.classList.remove('visible');
+        }
+        return;
+      }
+
+      /* إعادة تعيين لون الحقول */
+      pWageInputs.forEach(inp => { inp.style.borderColor = ''; inp.style.boxShadow = ''; });
+      pMonthsEl.style.borderColor = '';
+      pMonthsEl.style.boxShadow   = '';
+
+      const raw   = Math.floor(avg * 0.025 * months / 12);
+      const cap   = Math.floor(avg * 0.8);
+      const preMin = Math.min(raw, cap);
+      /* تطبيق الحد الأدنى للراتب التقاعدي */
+      const final = Math.max(preMin, MIN_PENSION);
+
+      pPensionEl.textContent = fmt(final);
+
+      pResultBox.classList.add('visible');
+      pResultNotes.classList.add('visible');
+
+      pNoteEl.textContent = '';
+      pCabinetNoteEl.textContent = '';
+      pCabinetNoteEl.style.display = 'none';
+
+      if (preMin < MIN_PENSION) {
+        pNoteEl.textContent = 'استناداً إلى المادة 36 من قانون الضمان، لا يقل الراتب التقاعدي عن الحد الأدنى لأجر العامل، والبالغ حالياً 350,000 دينار. وقد تم رفع الراتب إلى الحد الأدنى.';
+      }
+      if (final < 500000) {
+        pCabinetNoteEl.textContent = 'ملاحظة: استناداً إلى قرار مجلس الوزراء رقم 24436 لسنة 2024، لا يقل الراتب التقاعدي للقطاع الخاص عن 500,000 دينار.';
+        pCabinetNoteEl.style.display = 'block';
+      }
+
+      if (showErrors) pResultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    /* حساب لحظي عند كتابة الأشهر */
+    pMonthsEl.addEventListener('input', () => { if (pAllFilled()) pDoCalc(false); });
+
+    document.getElementById('p-calcBtn').addEventListener('click', () => { pDoCalc(true); });
+
+    /* إعادة تعيين لون الحقل عند الكتابة */
+    pWageInputs.forEach(inp => {
+      inp.addEventListener('input', () => { inp.style.borderColor = ''; inp.style.boxShadow = ''; });
+    });
+
+    /* =========================================================
+       ===== تقاعد الضمان الاختياري للأعمال الحرة =====
+    ========================================================= */
+    const oWageSelects  = document.querySelectorAll('.o-wage');
+    const oAvgSection   = document.getElementById('o-avgSection');
+    const oAvgOut       = document.getElementById('o-avgOut');
+    const oAvgNote      = document.getElementById('o-avgNote');
+    const oMonthsEl     = document.getElementById('o-months');
+    const oPensionEl    = document.getElementById('o-pension');
+    const oNoteEl       = document.getElementById('o-note');
+    const oCabinetNoteEl= document.getElementById('o-cabinetNote');
+    const oBuyBox       = document.getElementById('o-buyBox');
+    const oBuySelect    = document.getElementById('o-buyService');
+    const oServiceBox   = document.getElementById('o-serviceBox');
+    const oMonthPriceEl = document.getElementById('o-monthPrice');
+    const oYearPriceEl  = document.getElementById('o-yearPrice');
+    const oBuyMonthsEl  = document.getElementById('o-buyMonths');
+    const oTotalBuyEl   = document.getElementById('o-totalBuy');
+    const oBuyWarningEl = document.getElementById('o-buyWarning');
+    const oResultBox    = document.getElementById('o-resultBox');
+    const oResultNotes  = document.getElementById('o-resultNotes');
+
+    function oAllFilled() {
+      return Array.from(oWageSelects).every(sel => sel.value !== '');
+    }
+
+    function oUpdateAverage() {
+      if (!oAllFilled()) {
+        oAvgSection.style.display = 'none';
+        oBuyBox.style.display = 'none';
+        return;
+      }
+      let total = 0, count = 0;
+      oWageSelects.forEach((sel) => {
+        const v = parseInt(sel.value) || 0;
+        if (v > 0) { total += v; count++; }
+      });
+      let avg = count ? Math.round(total / count) : 0;
+      if (avg > MAX_WAGE) {
+        avg = MAX_WAGE;
+        oAvgNote.textContent = 'ملاحظة: أعلى أجر معتمد بدائرة الضمان هو 1,750,000 دينار';
+        oAvgNote.style.display = 'block';
+      } else {
+        oAvgNote.style.display = 'none';
+      }
+      oAvgOut.textContent = fmt(avg);
+      oAvgSection.style.display = 'block';
+      oBuyBox.style.display = 'block';
+      oUpdateServicePrices(avg);
+    }
+
+    function oUpdateServicePrices(avg) {
+      if (oBuySelect.value === 'yes' && avg > 0) {
+        const mPrice = Math.round(avg * 0.17);
+        const yPrice = mPrice * 12;
+        oMonthPriceEl.textContent = fmt(mPrice);
+        oYearPriceEl.textContent  = fmt(yPrice);
+        const m = parseInt(oBuyMonthsEl.value) || 0;
+        if (m > 60) {
+          oBuyWarningEl.textContent = '⚠️ لا يمكن شراء أكثر من 60 شهراً (5 سنوات)';
+          oTotalBuyEl.textContent   = fmt(60 * mPrice);
+        } else {
+          oBuyWarningEl.textContent = '';
+          oTotalBuyEl.textContent   = fmt(m * mPrice);
+        }
+      }
+    }
+
+    oWageSelects.forEach((sel) => { 
+      sel.addEventListener('change', () => {
+        sel.style.borderColor = '';
+        sel.style.boxShadow   = '';
+        oUpdateAverage();
+      }); 
+    });
+
+    oBuySelect.addEventListener('change', () => {
+      oServiceBox.style.display = oBuySelect.value === 'yes' ? 'block' : 'none';
+      if (oBuySelect.value === 'no') oBuyWarningEl.textContent = '';
+      oUpdateServicePrices(parseNum(oAvgOut.textContent));
+    });
+    oBuyMonthsEl.addEventListener('input', () => { oUpdateServicePrices(parseNum(oAvgOut.textContent)); });
+
+    /* حساب تلقائي لحظي عند تغيير الأشهر — الاختياري */
+    function oDoCalc(showErrors) {
+      const avg    = parseNum(oAvgOut.textContent);
+      const months = parseInt(oMonthsEl.value) || 0;
+
+      if (!oAllFilled()) {
+        if (showErrors) {
+          /* تحديد الحقول الفارغة بإطار أحمر */
+          oWageSelects.forEach(sel => {
+            if (sel.value === '') {
+              sel.style.borderColor = 'var(--red)';
+              sel.style.boxShadow   = '0 0 0 3px rgba(220,38,38,.15)';
+            }
+          });
+          oNoteEl.textContent = '⚠️ يرجى اختيار فئة الأجر لجميع السنوات الخمس أولاً.';
+          oResultBox.classList.remove('visible');
+          oResultNotes.classList.remove('visible');
+        }
+        return;
+      }
+
+      if (months <= 0) {
+        if (showErrors) {
+          oMonthsEl.style.borderColor = 'var(--red)';
+          oMonthsEl.style.boxShadow   = '0 0 0 3px rgba(220,38,38,.15)';
+          oNoteEl.textContent = '⚠️ يرجى إدخال عدد أشهر الخدمة.';
+          oResultBox.classList.remove('visible');
+          oResultNotes.classList.remove('visible');
+        }
+        return;
+      }
+
+      oMonthsEl.style.borderColor = '';
+      oMonthsEl.style.boxShadow   = '';
+
+      const raw   = Math.floor(avg * 0.025 * months / 12);
+      const cap   = Math.floor(avg * 0.8);
+      const preMin = Math.min(raw, cap);
+      /* تطبيق الحد الأدنى للراتب التقاعدي */
+      const final = Math.max(preMin, MIN_PENSION);
+
+      oPensionEl.textContent = fmt(final);
+
+      oResultBox.classList.add('visible');
+      oResultNotes.classList.add('visible');
+
+      oNoteEl.textContent = '';
+      oCabinetNoteEl.textContent = '';
+      oCabinetNoteEl.style.display = 'none';
+
+      if (preMin < MIN_PENSION) {
+        oNoteEl.textContent = 'استناداً إلى المادة 36 من قانون الضمان، لا يقل الراتب التقاعدي عن الحد الأدنى لأجر العامل، والبالغ حالياً 350,000 دينار. وقد تم رفع الراتب إلى الحد الأدنى.';
+      }
+      if (final < 500000) {
+        oCabinetNoteEl.textContent = 'ملاحظة: استناداً إلى قرار مجلس الوزراء رقم 24436 لسنة 2024، لا يقل الراتب التقاعدي عن 500,000 دينار.';
+        oCabinetNoteEl.style.display = 'block';
+      }
+
+      if (showErrors) oResultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    oMonthsEl.addEventListener('input', () => { if (oAllFilled()) oDoCalc(false); });
+
+    document.getElementById('o-calcBtn').addEventListener('click', () => { oDoCalc(true); });
+
+    /* =========================================================
+       تهيئة عداد الزوار الخارجي
+    ========================================================= */
+    /* يتم تحميل العداد الخارجي من websiteout.com تلقائياً */
+
+  </script>
+</body>
+</html>
