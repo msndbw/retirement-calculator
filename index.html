@@ -334,11 +334,31 @@
     .visitor-counter {
       margin-top: 16px; font-size: 13px; color: var(--text-muted);
       display: flex; align-items: center; justify-content: center; gap: 8px;
+      flex-wrap: wrap;
     }
     .counter-badge {
       background: var(--blue-pale); border: 1px solid rgba(59,130,246,.25);
       color: var(--blue); font-weight: 800; padding: 4px 14px;
       border-radius: 40px; font-size: 15px;
+    }
+    /* تنسيق حقل العداد الخارجي */
+    .visitor-counter-wrap {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--blue-pale); border: 1px solid rgba(59,130,246,.25);
+      border-radius: 40px; padding: 6px 18px;
+      font-size: 14px; color: var(--blue); font-weight: 700;
+    }
+    .visitor-counter-wrap * {
+      font-family: 'Tajawal', sans-serif !important;
+      color: var(--blue) !important;
+      font-size: 15px !important;
+      font-weight: 800 !important;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      vertical-align: middle;
     }
 
     /* ===== تحويل الأشهر إلى سنوات ===== */
@@ -415,6 +435,12 @@
 
       <div class="home-footer">
         📜 استناداً إلى قانون التقاعد والضمان الاجتماعي للعمال رقم 18 لسنة 2023 وقرار مجلس الوزراء رقم 24436 لسنة 2024
+      </div>
+      <div class="visitor-counter" style="margin-top:20px;">
+        <span>👥 عدد الزوار:</span>
+        <div class="visitor-counter-wrap">
+          <script type="text/javascript" src="https://counter.websiteout.com/js/7/0/0/0"></script>
+        </div>
       </div>
     </div>
   </div>
@@ -527,9 +553,10 @@
         </div>
         <div class="visitor-counter">
           <span>👥 عدد الزوار:</span>
-          <span class="counter-badge" id="p-visitorBadge"></span>
+          <div class="visitor-counter-wrap">
+            <script type="text/javascript" src="https://counter.websiteout.com/js/7/0/0/0"></script>
+          </div>
         </div>
-        <script type="text/javascript" src="https://counter.websiteout.com/js/7/0/0/0"></script>
       </div>
     </div>
   </div>
@@ -728,9 +755,10 @@
         </div>
         <div class="visitor-counter">
           <span>👥 عدد الزوار:</span>
-          <span class="counter-badge" id="o-visitorBadge"></span>
+          <div class="visitor-counter-wrap">
+            <script type="text/javascript" src="https://counter.websiteout.com/js/7/0/0/0"></script>
+          </div>
         </div>
-        <script type="text/javascript" src="https://counter.websiteout.com/js/7/0/0/0"></script>
       </div>
     </div>
   </div>
