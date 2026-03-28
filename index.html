@@ -436,10 +436,19 @@
       <div class="home-footer">
         📜 استناداً إلى قانون التقاعد والضمان الاجتماعي للعمال رقم 18 لسنة 2023 وقرار مجلس الوزراء رقم 24436 لسنة 2024
       </div>
-      <div class="visitor-counter" style="margin-top:20px;">
-        <span>👥 عدد الزوار:</span>
-        <div class="visitor-counter-wrap">
-          <script type="text/javascript" src="https://counter.websiteout.com/js/7/0/0/0"></script>
+      <div class="site-footer" style="margin-top:20px;">
+        <div>للمزيد من المعلومات يمكنكم التواصل عبر صفحتنا على الفيسبوك</div>
+        <div style="margin-top:10px;">
+          <a class="fb-link" href="https://www.facebook.com/share/1Ag3EosVga/" target="_blank" rel="noopener">
+            <svg class="fb-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073C24 5.404 18.627 0 12 0S0 5.404 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+            التقاعد الاختياري العراقي
+          </a>
+        </div>
+        <div class="visitor-counter">
+          <span>👥 عدد الزوار:</span>
+          <div class="visitor-counter-wrap">
+            <script type="text/javascript" src="https://counter.websiteout.com/js/7/0/0/0"></script>
+          </div>
         </div>
       </div>
     </div>
@@ -544,7 +553,7 @@
 
       <!-- ذيل صفحة القطاع الخاص -->
       <div class="site-footer">
-        <div>للمزيد من الاستفسارات يمكنكم التواصل عبر صفحتنا على الفيسبوك</div>
+        <div>للمزيد من المعلومات يمكنكم التواصل عبر صفحتنا على الفيسبوك</div>
         <div style="margin-top:10px;">
           <a class="fb-link" href="https://www.facebook.com/share/1Ag3EosVga/" target="_blank" rel="noopener">
             <svg class="fb-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073C24 5.404 18.627 0 12 0S0 5.404 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
@@ -746,7 +755,7 @@
 
       <!-- ذيل صفحة الاختياري -->
       <div class="site-footer">
-        <div>للمزيد من الاستفسارات يمكنكم التواصل عبر صفحتنا على الفيسبوك</div>
+        <div>للمزيد من المعلومات يمكنكم التواصل عبر صفحتنا على الفيسبوك</div>
         <div style="margin-top:10px;">
           <a class="fb-link" href="https://www.facebook.com/share/1Ag3EosVga/" target="_blank" rel="noopener">
             <svg class="fb-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073C24 5.404 18.627 0 12 0S0 5.404 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
@@ -859,6 +868,8 @@
     const pResultBox    = document.getElementById('p-resultBox');
     const pResultNotes  = document.getElementById('p-resultNotes');
 
+    const MIN_WAGE = 350000; /* الحد الأدنى للأجر المعتمد */
+
     function pValidateLimitWage(input, warning) {
       let value = parseNum(input.value);
       if (value > MAX_WAGE) {
@@ -866,13 +877,34 @@
         input.value = fmt(MAX_WAGE); /* تصحيح تلقائي */
         warning.textContent = 'تم تعديل الأجر تلقائياً إلى الحد الأقصى: أعلى أجر معتمد بدائرة الضمان هو 1,750,000 دينار';
         warning.style.display = 'block';
+        warning.style.color = 'var(--amber)';
       } else if (value === MAX_WAGE && value > 0) {
         warning.textContent = 'أعلى أجر معتمد بدائرة الضمان هو 1,750,000 دينار';
         warning.style.display = 'block';
+        warning.style.color = 'var(--amber)';
+      } else if (value > 0 && value < MIN_WAGE) {
+        warning.textContent = 'أقل حد للأجر المعتمد في دائرة الضمان هو 350,000 دينار';
+        warning.style.display = 'block';
+        warning.style.color = 'var(--red)';
+        warning.style.background = 'var(--red-pale)';
+        warning.style.border = '1px solid #fca5a5';
       } else {
         warning.style.display = 'none';
       }
       return value;
+    }
+
+    function pAutoCorrectMinWage(input, warning) {
+      const value = parseNum(input.value);
+      if (value > 0 && value < MIN_WAGE) {
+        input.value = fmt(MIN_WAGE);
+        warning.textContent = 'تم تعديل الأجر تلقائياً إلى الحد الأدنى المعتمد: 350,000 دينار';
+        warning.style.display = 'block';
+        warning.style.color = 'var(--amber)';
+        warning.style.background = '#fffbeb';
+        warning.style.border = '1px solid #fde68a';
+        pUpdateAverage();
+      }
     }
 
     function pAllFilled() {
@@ -937,6 +969,7 @@
       inp.addEventListener('blur', (e) => {
         let raw = parseNum(e.target.value);
         if (raw > 0) e.target.value = fmt(raw);
+        pAutoCorrectMinWage(inp, pWageWarnings[i]);
         pValidateLimitWage(inp, pWageWarnings[i]);
         pUpdateAverage();
       });
@@ -1015,7 +1048,7 @@
     }
 
     /* حساب لحظي عند كتابة الأشهر */
-    pMonthsEl.addEventListener('input', () => { if (pAllFilled()) pDoCalc(false); });
+    /* الحساب اليدوي فقط عند الضغط على زر الاحتساب — لا حساب تلقائي للقطاع الخاص */
 
     document.getElementById('p-calcBtn').addEventListener('click', () => { pDoCalc(true); });
 
