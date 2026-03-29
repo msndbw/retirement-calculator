@@ -1021,7 +1021,9 @@
       pMonthsEl.style.borderColor = '';
       pMonthsEl.style.boxShadow   = '';
 
-      const raw   = Math.floor(avg * 0.025 * months / 12);
+      /* كسر الشهر الأخير يُعدّ كالشهر الكامل — المادة 35 */
+      const effectiveMonths = Math.ceil(months);
+      const raw   = Math.floor(avg * 0.025 * effectiveMonths / 12);
       const cap   = Math.floor(avg * 0.8);
       const preMin = Math.min(raw, cap);
       /* تطبيق الحد الأدنى للراتب التقاعدي */
@@ -1175,7 +1177,9 @@
       oMonthsEl.style.borderColor = '';
       oMonthsEl.style.boxShadow   = '';
 
-      const raw   = Math.floor(avg * 0.025 * months / 12);
+      /* كسر الشهر الأخير يُعدّ كالشهر الكامل — المادة 35 */
+      const effectiveMonths = Math.ceil(months);
+      const raw   = Math.floor(avg * 0.025 * effectiveMonths / 12);
       const cap   = Math.floor(avg * 0.8);
       const preMin = Math.min(raw, cap);
       /* تطبيق الحد الأدنى للراتب التقاعدي */
